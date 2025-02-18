@@ -31,7 +31,7 @@ class Ship:
         self.engine_specs = self.get_rocket_specs(rocket_engine)
         self.engines = engines
         self.fuel_mass = fuel_mass
-        self.thrust = self.get_thrust(thrust,engines)  # Newtons x number of Raptor engines
+        self.thrust = 0  # Newtons x number of Raptor engines
         self.thrust_vec = np.array([0.0, 0.0, 0.0]) * self.thrust
         self.displacement_enu = np.array([0.0, 0.0, 0.0])  # displaced distance in meters from origin in 3 axis
         self.velocity_vec = np.array([0.0, 0.0, 0.0])  # Velocity vector
@@ -40,11 +40,11 @@ class Ship:
         self.burn_rate = burn_rate  # how fast fuel burns
         self.rocket_mass = rocket_mass
         self.total_mass = self.rocket_mass + self.fuel_mass  # kg
-        self.weight = np.array([0.0, 0.0, -self.total_mass * GRAVITY])
+        self.weight_vec = np.array([0.0, 0.0, -self.total_mass * GRAVITY])
         self.flight_time = 0.0
         self.flight_log = pd.DataFrame(
             {"LAT": [0], "LONG": [0], "ALT": [0], "Time": [0.00], "Velocity": 0.0, "Acceleration": 0.0,
-             "Weight": self.weight[2], "Q": 0.0, "Fuel": self.fuel_mass})
+             "Weight": self.weight_vec[2], "Q": 0.0, "Fuel": self.fuel_mass})
         self.altitude = []  #  ['LAT', 'LONG', 'ALT', "Time", "Velocity", "Acceleration"]
 
     def launch(self, initial_velocity, flight_path):
@@ -54,12 +54,14 @@ class Ship:
     def velocity_(self):
         ve = isp*GRAVITY
         delta_v = ve*ln(m0/mf)
-    def get_thrust(self,thrust,engines):
+    def get_thrust(self):
         if self.fuel_mass > 0:
-            max_thrust = thrust * engines
+            max_thrust = 2_260_000 * 33
             print(self.engine_specs)
+            self.thrust = max_thrust
             return max_thrust
         else:
+            self.thrust = 0
             return 0
         #     print(self.engine_specs.index)
         #     R = self.engine_specs.loc["R"]
@@ -106,7 +108,7 @@ class Ship:
 
     def fly(self):
         # Step 1: Accumulate velocity updates rather than overwriting.
-
+        self.get_thrust()
         rho = rho_0 * np.exp(-self.position["ALT"] / H)
         drag_magnitude = 0.5 * Cd * rho * (self.get_velocity() ** 2) * AREA
         speed = self.get_velocity()
@@ -126,7 +128,7 @@ class Ship:
             self.thrust_vec[2] = self.thrust * np.sin(self.elevation)
 
         # print(f"Thrust: {self.thrust_vec}")
-        net_force = self.thrust_vec + self.weight + drag_vec
+        net_force = self.thrust_vec + self.weight_vec + drag_vec
 
         # Update accelerations
         self.acceleration_vec = (net_force / self.total_mass)
@@ -140,19 +142,21 @@ class Ship:
         self.altitude.append(self.position["ALT"])
 
         # Burn fuel
-        if self.fuel_mass>0:
+        if self.fuel_mass > 0:
             self.fuel_mass -= self.burn_rate * self.engines * dt
             self.total_mass = self.rocket_mass + self.fuel_mass  # recalc each step
-            self.weight = np.array([0.0, 0.0, -self.total_mass * GRAVITY])  # if you want to keep it 'positive up'
+            self.weight_vec = np.array([0.0, 0.0, -self.total_mass * GRAVITY])  # if you want to keep it 'positive up'
         else:
-            pass
+            self.burn_rate = 0
+            self.fuel_mass = 0
+
         # Increase time
         self.flight_time += dt
 
         # Log flight path
         new_row = pd.DataFrame([[self.position["LAT"], self.position["LONG"], self.position["ALT"], self.flight_time,
-                                 speed, acceleration, self.weight[2], dynamic_pressure, self.fuel_mass]],
-                               columns=['LAT', 'LONG', 'ALT', "Time", "Velocity", "Acceleration", "Weight", "Q",
+                                 speed, self.thrust, acceleration, self.weight_vec[2], dynamic_pressure, self.fuel_mass]],
+                               columns=['LAT', 'LONG', 'ALT', "Time", "Velocity", "Thrust",  "Acceleration", "Weight", "Q",
                                         "Fuel"])
         self.flight_log = pd.concat([self.flight_log, new_row], ignore_index=True)
         # print(self.displacement_enu)
