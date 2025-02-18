@@ -1,0 +1,14 @@
+Parameter,Value,Units
+Chamber Pressure (Pc),30000000.0,Pa
+Chamber Temperature (Tc),3500.0,K
+Throat Area (At),0.052,m²
+Exit Area (Ae),0.7,m²
+Exhaust Pressure (Pe),5000.0,Pa
+"Ambient Pressure (Sea Level, Pa_sea)",101300.0,Pa
+"Ambient Pressure (Vacuum, Pa_vac)",0.0,Pa
+Specific Gas Constant (R),370.0,J/kg·K
+Ratio of Specific Heats (γ),1.25,unitless
+Mass Flow Rate (ṁ),2603.9405915900197,kg/s
+Exhaust Velocity (ve),3267.5358003992587,m/s
+Thrust at Sea Level,8441059.105133215,N
+Thrust in Vacuum,8511969.105133215,N

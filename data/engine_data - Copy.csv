@@ -1,0 +1,2 @@
+Engine Name,Chamber Pressure (Pc),Chamber Temperature (Tc),Throat Area (At),Exit Area (Ae),Exhaust Pressure (Pe),"Ambient Pressure (Sea Level, Pa_sea)","Ambient Pressure (Vacuum, Pa_vac)",Specific Gas Constant (R),Ratio of Specific Heats (γ),Mass Flow Rate (ṁ),Exhaust Velocity (ve),Thrust at Sea Level,Thrust in Vacuum
+Raptor,30000000,3500,0.052,0.7,5000,101300,0,370,1.25,2603.940592,3267.5358,8441059.105,8511969.105

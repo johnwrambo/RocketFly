@@ -1,0 +1,2 @@
+Engine Name,Pc,Tc,At,Ae,Pe,Pa,Pa_vac,R,gamma,Mass Flow Rate (ṁ),Exhaust Velocity (ve),Thrust at Sea Level,Thrust in Vacuum
+Raptor,30000000,3500,0.052,0.7,5000,101300,0,370,1.25,2603.940592,3267.5358,8441059.105,8511969.105
